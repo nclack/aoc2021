@@ -32,18 +32,14 @@ impl Part1 {
 
 impl Part2 {
     /// Input is a list of measurements.
-    /// How many window measurements are larger than the previous measurement?
+    /// Over sliding windows of size 3, how many are larger than the previous measurement?
     pub fn solve(input: &str) -> Result<i64> {
         let (rest, xs) = parse(input).unwrap();
         assert!(rest.len() == 0);
 
-        let out = xs
-            .windows(3)
-            .map(|w| w.iter().sum())
-            .collect::<Vec<i64>>()
-            .windows(2)
-            .map(|w| (w[1] > w[0]) as i64)
-            .sum();
+        // 012
+        //  123
+        let out = xs.windows(4).map(|w| (w[3] > w[0]) as i64).sum();
 
         Ok(out)
     }
