@@ -1,4 +1,4 @@
-use crate::Result;
+use anyhow::Result;
 use nom::{
     character::complete::{digit1, line_ending},
     combinator::{map_res, opt},
@@ -53,6 +53,6 @@ fn day1() {
     );
     assert_eq!(
         5,
-        Part2::solve(include_str!("../assets/day1.1.test.txt")).unwrap()
+        Part2::solve(include_str!("../assets/day1.0.test.txt")).unwrap()
     );
 }
