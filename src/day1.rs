@@ -1,4 +1,4 @@
-use crate::{day1, Result, Solution};
+use crate::Result;
 use nom::{
     character::complete::{digit1, line_ending},
     combinator::{map_res, opt},
@@ -17,10 +17,10 @@ fn parse(input: &str) -> IResult<&str, Vec<i64>> {
     ))(input)
 }
 
-impl Solution for Part1 {
+impl Part1 {
     /// Input is a list of measurements.
     /// How many measurements are larger than the previous measurement?
-    fn solve(input: &str) -> Result<i64> {
+    pub fn solve(input: &str) -> Result<i64> {
         let (rest, xs) = parse(input).unwrap();
         assert!(rest.len() == 0);
 
@@ -30,10 +30,10 @@ impl Solution for Part1 {
     }
 }
 
-impl Solution for Part2 {
+impl Part2 {
     /// Input is a list of measurements.
     /// How many window measurements are larger than the previous measurement?
-    fn solve(input: &str) -> Result<i64> {
+    pub fn solve(input: &str) -> Result<i64> {
         let (rest, xs) = parse(input).unwrap();
         assert!(rest.len() == 0);
 
@@ -53,10 +53,10 @@ impl Solution for Part2 {
 fn day1() {
     assert_eq!(
         7,
-        day1::Part1::solve(include_str!("../assets/day1.0.test.txt")).unwrap()
+        Part1::solve(include_str!("../assets/day1.0.test.txt")).unwrap()
     );
     assert_eq!(
         5,
-        day1::Part2::solve(include_str!("../assets/day1.1.test.txt")).unwrap()
+        Part2::solve(include_str!("../assets/day1.1.test.txt")).unwrap()
     );
 }
