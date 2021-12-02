@@ -3,25 +3,27 @@ mod day2;
 
 macro_rules! problems {
     ()=>{};
-    ($day:tt $part:tt $input:tt, $($rest:tt)*) => {
-        problems!($day $part $input);
+    ($day:tt $($parts:ident)+, $($rest:tt)*) => {
+        problems!($day $($parts)+);
         problems!($($rest)*);
     };
-    ($day:tt $part:tt $input:tt)=>{
+    ($day:tt $part:tt $($rest:tt)+) => {
+        problems!($day $part);
+        problems!($day $($rest)+);
+    };
+    ($day:tt $part:tt)=>{
         println!(
             "{} {}\t{:?}",
             stringify!($day),
             stringify!($part),
-            $day::$part::solve(include_str!($input))
+            $day::$part::solve(include_str!(concat!("../assets/",stringify!($day),".0.txt")))
         );
-    }
+    };
 }
 
 fn main() {
     problems!(
-        day1 Part1 "../assets/day1.0.txt",
-        day1 Part2 "../assets/day1.0.txt",
-        day2 Part1 "../assets/day2.0.txt",
-        day2 Part2 "../assets/day2.0.txt",
+        day1 Part1 Part2,
+        day2 Part1 Part2,
     );
 }
