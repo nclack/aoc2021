@@ -8,3 +8,10 @@ edition = "2021"
 [dependencies]
 nom = "7"
 anyhow = "1"
+
+[dev-dependencies]
+criterion="*"
+
+[[bench]]
+name = "benchmark"
+harness = false
