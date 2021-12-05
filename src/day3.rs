@@ -1,8 +1,4 @@
-use std::{
-    borrow::BorrowMut,
-    cell::{RefCell, RefMut},
-    rc::Rc,
-};
+use std::{cell::RefCell, rc::Rc};
 
 use anyhow::Result;
 use nom::{
@@ -101,14 +97,6 @@ impl Part2 {
         // Want to build a binary tree and keep track of how many children are
         // down each branch.
         fn parse(input: &str) -> IResult<&str, (usize, usize)> {
-            fn count(n: &Option<Rc<RefCell<Node>>>) -> Option<usize> {
-                n.as_ref().map(|n| n.as_ref().borrow().count)
-            }
-            fn child_counts(n: Rc<RefCell<Node>>) -> (Option<usize>, Option<usize>) {
-                let (l, r) = &n.as_ref().borrow().children;
-                (count(&l), count(&r))
-            }
-
             let bits = many1(alt((value(0i8, tag("0")), value(1, tag("1")))));
             map(
                 fold_many1(terminated(bits, opt(line_ending)), Node::new, |acc, n| {
@@ -125,39 +113,8 @@ impl Part2 {
                     acc
                 }),
                 |tree| {
-                    let mut ox = 0;
-                    let mut cur = Some(tree.clone());
-                    while let Some(node) = cur.as_ref() {
-                        let (n0, n1) = child_counts(node.clone());
-                        let (next, bit) = if n1.is_some() && n1 >= n0 {
-                            (node.borrow().children.1.clone(), 1)
-                        } else if n0.is_some() {
-                            (node.borrow().children.0.clone(), 0)
-                        } else {
-                            (None, 0)
-                        };
-                        cur = next;
-                        if cur.is_some() {
-                            ox = (ox << 1) + bit;
-                        }
-                    }
-
-                    let mut co2 = 0;
-                    let mut cur = Some(tree.clone());
-                    while let Some(node) = cur.as_ref() {
-                        let (n0, n1) = child_counts(node.clone());
-                        let (next, bit) = if n1.is_some() && (n0.is_none() || n1 < n0) {
-                            (node.borrow().children.1.clone(), 1)
-                        } else if n0.is_some() {
-                            (node.borrow().children.0.clone(), 0)
-                        } else {
-                            (None, 0)
-                        };
-                        cur = next;
-                        if cur.is_some() {
-                            co2 = (co2 << 1) + bit;
-                        }
-                    }
+                    let ox = readout(&tree, |n0, n1| n1 >= n0);
+                    let co2 = readout(&tree, |n0, n1| n1 < n0);
                     (ox, co2)
                 },
             )(input)
@@ -167,6 +124,36 @@ impl Part2 {
         assert!(rest.len() == 0);
         Ok(ox * co2)
     }
+}
+
+/// Readout bits from the tree picking branches with 'pred'.
+fn readout<F>(tree: &Rc<RefCell<Node>>, pred: F) -> usize
+where
+    F: Fn(usize, usize) -> bool,
+{
+    fn count(n: &Option<Rc<RefCell<Node>>>) -> Option<usize> {
+        n.as_ref().map(|n| n.borrow().count)
+    }
+    fn child_counts(n: Rc<RefCell<Node>>) -> (Option<usize>, Option<usize>) {
+        let (l, r) = &n.borrow().children;
+        (count(&l), count(&r))
+    }
+
+    let mut out = 0;
+    let mut cur = Some(tree.clone());
+    while let Some(node) = cur.as_ref() {
+        let (next, bit) = match child_counts(node.clone()) {
+            (Some(n0), Some(n1)) if pred(n0, n1) => (node.borrow().children.1.clone(), 1),
+            (None, Some(_)) => (node.borrow().children.1.clone(), 1),
+            (Some(_), _) => (node.borrow().children.0.clone(), 0),
+            _ => (None, 0),
+        };
+        cur = next;
+        if cur.is_some() {
+            out = (out << 1) + bit;
+        }
+    }
+    out
 }
 
 #[test]
