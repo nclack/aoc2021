@@ -10,7 +10,7 @@ nom = "7"
 anyhow = "1"
 
 [dev-dependencies]
-criterion="*"
+criterion = "*"
 
 [[bench]]
 name = "benchmark"
