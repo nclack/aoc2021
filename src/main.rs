@@ -3,6 +3,7 @@ mod day2;
 mod day3;
 mod day4;
 mod day5;
+mod day6;
 
 macro_rules! problems {
     ()=>{};
@@ -30,6 +31,7 @@ fn main() {
         day2 Part1 Part2,
         day3 Part1 Part2,
         day4 Part1 Part2,
-        day5 Part1 Part2
+        day5 Part1 Part2,
+        day6 Part1 Part2,
     );
 }
